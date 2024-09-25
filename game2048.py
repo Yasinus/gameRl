@@ -1,25 +1,16 @@
 import numpy as np
 import random
-import copy
-import time
-import numpy as np
-import random
-import copy
-import time
-import pygame
-import torch
+
 
 
 class Game2048:
-    def __init__(self, size=4, pygame_enabled=True):
+
+    def __init__(self, size=4, flatten_state=True):
         self.size = size
+        self.state_as_board = flatten_state
         self.reset()
 
-        # self.pygame_enabled = pygame_enabled
-        # if self.pygame_enabled:
-        #     pygame.init()
-        #     self.screen = pygame.display.set_mode((400, 400))
-        #     pygame.display.set_caption("2048 Game")
+
 
     def reset(self):
         self.board = np.zeros((self.size, self.size), dtype=int)
@@ -28,16 +19,26 @@ class Game2048:
         self.add_random_tile()
         return self.get_state()
 
+
+
     def get_state(self):
         board = self.board.copy()
         board[board == 0] = 1
-        return np.log2(board).flatten()
+        board = np.log2(board)
+        if self.state_as_board:
+            return board.flatten()
+        return board
+    
+
+
 
     def add_random_tile(self):
         empty_tiles = [(i, j) for i in range(self.size) for j in range(self.size) if self.board[i, j] == 0]
         if empty_tiles:
             i, j = random.choice(empty_tiles)
             self.board[i, j] = 2 if random.random() < 0.9 else 4
+
+
 
     def move(self, direction):
         match direction:
@@ -63,6 +64,8 @@ class Game2048:
                 raise ValueError('Invalid direction')
         self.add_random_tile()
         return self.get_state(), score
+
+
 
     def move_left(self, board):
         score = 0
@@ -92,12 +95,16 @@ class Game2048:
                     k += 1
         return new_board, score
 
+
+
     def is_game_over(self):
         for direction in ['up', 'down', 'left', 'right']:
             if self.can_move(direction):
                 return False
         return True
     
+
+
     def can_move(self, direction):
         match direction:
             case 'up':
@@ -114,6 +121,8 @@ class Game2048:
             case _:
                 raise ValueError('Invalid direction')
     
+
+
     def can_move_left(self, board):
         for i in range(self.size):
             had_zero = board[i, 0] == 0
@@ -124,8 +133,3 @@ class Game2048:
                 if board[i, j] == board[i, j - 1] or had_zero or (board[i, 0] == 0 and not had_zero):
                     return True
         return False
-
-
-
-# Create an instance of the game and play it
- 

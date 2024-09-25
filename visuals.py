@@ -1,5 +1,4 @@
 import pygame
-import numpy as np
 from game2048 import Game2048
 import torch
 
@@ -74,6 +73,7 @@ class Visual:
 
 
     def model_play(self, model,game):
+        cannot_move_count = 0
         while not game.is_game_over():
             action = torch.argmax(model(torch.tensor(game.get_state(), dtype=torch.float32).unsqueeze(0))).item()
             game.move(['up', 'down', 'left', 'right'][action])
@@ -84,7 +84,13 @@ class Visual:
         pygame.time.wait(2000)
         pygame.quit()
 
-# visual = Visual()
-# game = Game2048()
+def main():
+    visual = Visual()
+    game = Game2048()
+    visual.play_game(game)
+    # visual.model_play(model,game)
 
-# visual.play_game(game)
+if __name__ == '__main__':
+    main()
+
+
